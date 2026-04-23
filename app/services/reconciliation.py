@@ -82,10 +82,9 @@ def get_discrepancies(db: Session):
         Event.transaction_id.in_(settled_txns)
     ).all()
 
-    # Case 3: conflicting states (NEW 🔥)
+    # Case 3: conflicting states 
     conflicting_transactions = get_conflicting_transactions(db)
 
-    # Convert ORM objects to dict (important for FastAPI)
     def serialize_events(events):
         return [
             {
