@@ -176,17 +176,6 @@ uvicorn app.main:app --reload
 
 ---
 
-## 🎥 Demo
-
-Demo covers:
-
-* Event ingestion
-* Duplicate handling
-* Transactions API
-* Reconciliation APIs
-
----
-
 ## 📬 Postman Collection
 
 A Postman collection is provided to test all APIs easily.
@@ -272,6 +261,24 @@ All implementation decisions were validated and executed independently.
 * Deployed a **fully working public service**
 
 ---
+
+## 🎥 Demo Video
+
+A walkthrough of the system is available here:
+
+👉 loom link: https://www.loom.com/share/a560e0dca0f0474ca18f9cda78c6bc48
+👉 Google drive link: https://drive.google.com/file/d/1LmJ-ELpqV5VGsERhPpASKjUd-zbc58ow/view?usp=sharing
+
+The demo covers:
+
+* Event ingestion
+* Duplicate handling (idempotency)
+* Transactions API with filters
+* Reconciliation summary
+* Discrepancy detection with optional filtering
+
+---
+
 
 ## 📎 Submission Includes
 

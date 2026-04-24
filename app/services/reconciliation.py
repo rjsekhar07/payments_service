@@ -88,7 +88,6 @@ def get_discrepancies(db: Session, type=None):
         "conflicting_transactions": conflicting_transactions
     }
 
-    # ✅ APPLY FILTER
     if type:
         return {type.value: result[type.value]}
 
