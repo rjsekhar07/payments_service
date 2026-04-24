@@ -7,6 +7,10 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"message": "Payment Reconciliation API is running"}
+
 app.include_router(events.router)
 app.include_router(transactions.router)
 app.include_router(reconciliation.router)
