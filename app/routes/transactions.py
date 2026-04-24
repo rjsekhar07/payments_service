@@ -10,17 +10,25 @@ router = APIRouter()
 
 @router.get("/transactions")
 def get_transactions(
-    merchant_id: str = None,
-    status: str = None,
-    start_date: datetime = Query(None, description="Start timestamp (ISO format)"),
-    end_date: datetime = Query(None, description="End timestamp (ISO format)"),
-    skip: int = 0,
-    limit: int = 10,
-    sort_by: str = "timestamp",
-    order: str = "desc",
+    merchant_id: str = Query(None, example="m_001"),
+    status: str = Query(None, example="processed"),
+    start_date: datetime = Query(
+        None,
+        description="Start timestamp (ISO format)",
+        example="2026-04-01T00:00:00+00:00"
+    ),
+    end_date: datetime = Query(
+        None,
+        description="End timestamp (ISO format)",
+        example="2026-04-03T00:00:00+00:00"
+    ),
+    skip: int = Query(0, example=0),
+    limit: int = Query(10, example=10),
+    sort_by: str = Query("timestamp", example="timestamp"),
+    order: str = Query("desc", example="desc"),
     db: Session = Depends(get_db)
 ):
-    query = db.query(Transaction)
+    query = db.query(Transaction).join(Event, Transaction.transaction_id == Event.transaction_id)
 
     # Filtering
     if merchant_id:
@@ -31,17 +39,19 @@ def get_transactions(
 
     # Date range filtering
     if start_date:
-        query = query.filter(Transaction.timestamp >= start_date)
+        start_date = datetime.fromisoformat(start_date)
+        query = query.filter(Event.timestamp >= start_date)
 
     if end_date:
-        query = query.filter(Transaction.timestamp <= end_date)
+        end_date = datetime.fromisoformat(end_date)
+        query = query.filter(Event.timestamp <= end_date)
 
     # Sorting
     if sort_by == "timestamp":
         if order == "asc":
-            query = query.order_by(Transaction.timestamp.asc())
+            query = query.order_by(Event.timestamp.asc())
         else:
-            query = query.order_by(Transaction.timestamp.desc())
+            query = query.order_by(Event.timestamp.desc())
 
     total = query.count()
 
