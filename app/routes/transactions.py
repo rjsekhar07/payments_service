@@ -8,17 +8,17 @@ router = APIRouter()
 
 @router.get("/transactions")
 def get_transactions(
-    merchant_id: str = Query(None, example="m_001"),
-    status: str = Query(None, example="processed"),
+    merchant_id: str = Query(None, example="merchant_1"),
+    status: str = Query(None, example="payment_processed"),
     start_date: datetime = Query(
         None,
         description="Start date (ISO format)",
-        example="2026-04-01T00:00:00+00:00"
+        example="2026-04-01T00:00:00"
     ),
     end_date: datetime = Query(
         None,
         description="End date (ISO format)",
-        example="2026-04-03T00:00:00+00:00"
+        example="2026-04-03T00:00:00"
     ),
     skip: int = Query(0, example=0),
     limit: int = Query(10, example=10),
