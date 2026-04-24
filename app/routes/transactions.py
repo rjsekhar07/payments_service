@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-from app.dependencies import get_db   
+from app.dependencies import get_db
 from app.models.transaction import Transaction
+from app.models.event import Event
 
 router = APIRouter()
+
 
 @router.get("/transactions")
 def get_transactions(
@@ -27,7 +29,7 @@ def get_transactions(
     if status:
         query = query.filter(Transaction.status == status)
 
-    # Date range filtering (using timestamp)
+    # Date range filtering
     if start_date:
         query = query.filter(Transaction.timestamp >= start_date)
 
@@ -43,7 +45,6 @@ def get_transactions(
 
     total = query.count()
 
-  
     transactions = query.offset(skip).limit(limit).all()
 
     return {
@@ -52,3 +53,12 @@ def get_transactions(
         "limit": limit,
         "data": transactions
     }
+
+@router.get("/transactions/{txn_id}")
+def get_transaction_by_id(txn_id: str, db: Session = Depends(get_db)):
+    transaction = db.query(Transaction).filter(Transaction.transaction_id == txn_id).first()
+
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    return transaction
