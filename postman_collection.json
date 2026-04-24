@@ -1,0 +1,188 @@
+{
+	"info": {
+		"_postman_id": "3caa075e-9f91-4829-a0a2-91d1129837f3",
+		"name": "Payment Service Apis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46584125",
+		"_collection_link": "https://rajsekhar-5119798.postman.co/workspace/Raj-Sekhar's-Workspace~3f90ead2-9490-4ddb-8ed0-ceb1d713f7e1/collection/46584125-3caa075e-9f91-4829-a0a2-91d1129837f3?action=share&source=collection_link&creator=46584125"
+	},
+	"item": [
+		{
+			"name": "Post/events",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"event_id\": \"1ef9ff08-6847-4e10-acd7-c730d7816ee2\",\n    \"event_type\": \"payment_processed\",\n    \"transaction_id\": \"0b8ce726-8a8d-4fc6-b5b9-d5c5ecba0edb\",\n    \"merchant_id\": \"merchant_5\",\n    \"merchant_name\": \"StyleHub\",\n    \"amount\": 41496.5,\n    \"currency\": \"INR\",\n    \"timestamp\": \"2026-04-02T02:11:30.466464+00:00\"\n  }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/events",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /events/{event_id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/events/{event_id}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"events",
+						"{event_id}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/transactions?merchant_id=merchant_2&status=payment_processed&start_date=2026-04-01T00:00:00&end_date=2026-04-03T00:00:00&skip=0&limit=5&order=desc",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"transactions"
+					],
+					"query": [
+						{
+							"key": "merchant_id",
+							"value": "merchant_2",
+							"description": "Filter by merchant"
+						},
+						{
+							"key": "status",
+							"value": "payment_processed",
+							"description": "Filter by status"
+						},
+						{
+							"key": "start_date",
+							"value": "2026-04-01T00:00:00",
+							"description": "Start date (ISO)"
+						},
+						{
+							"key": "end_date",
+							"value": "2026-04-03T00:00:00",
+							"description": "End date (ISO)"
+						},
+						{
+							"key": "skip",
+							"value": "0",
+							"description": "Pagination offset"
+						},
+						{
+							"key": "limit",
+							"value": "5",
+							"description": "Number of records"
+						},
+						{
+							"key": "order",
+							"value": "desc",
+							"description": "Sort order"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /transaction by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/transactions/{txn_id}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"transactions",
+						"{txn_id}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /reconciliation/summary",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/reconciliation/summary",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"reconciliation",
+						"summary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /reconciliation/discrepancies",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/reconciliation/discrepancies",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"reconciliation",
+						"discrepancies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET discrepancies (filtered)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/reconciliation/discrepancies?type=failed_but_settled",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"reconciliation",
+						"discrepancies"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "failed_but_settled",
+							"description": "Allowed: processed_not_settled, failed_but_settled, conflicting_transactions"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
