@@ -58,7 +58,7 @@ def get_transactions(
 @router.get("/transactions/{txn_id}")
 def get_transaction_by_id(txn_id: str, db: Session = Depends(get_db)):
     transaction = db.query(Transaction).filter(
-        Transaction.transaction_id == txn_id   # adjust if needed
+        Transaction.id == txn_id   
     ).first()
 
     if not transaction:
