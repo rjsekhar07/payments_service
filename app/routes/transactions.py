@@ -3,10 +3,8 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from app.dependencies import get_db
 from app.models.transaction import Transaction
-from app.models.event import Event
 
 router = APIRouter()
-
 
 @router.get("/transactions")
 def get_transactions(
@@ -14,44 +12,37 @@ def get_transactions(
     status: str = Query(None, example="processed"),
     start_date: datetime = Query(
         None,
-        description="Start timestamp (ISO format)",
+        description="Start date (ISO format)",
         example="2026-04-01T00:00:00+00:00"
     ),
     end_date: datetime = Query(
         None,
-        description="End timestamp (ISO format)",
+        description="End date (ISO format)",
         example="2026-04-03T00:00:00+00:00"
     ),
     skip: int = Query(0, example=0),
     limit: int = Query(10, example=10),
-    sort_by: str = Query("timestamp", example="timestamp"),
     order: str = Query("desc", example="desc"),
     db: Session = Depends(get_db)
 ):
-    query = db.query(Transaction).join(Event, Transaction.transaction_id == Event.transaction_id)
+    query = db.query(Transaction)
 
-    # Filtering
     if merchant_id:
         query = query.filter(Transaction.merchant_id == merchant_id)
 
     if status:
         query = query.filter(Transaction.status == status)
 
-    # Date range filtering
     if start_date:
-        start_date = datetime.fromisoformat(start_date)
-        query = query.filter(Event.timestamp >= start_date)
+        query = query.filter(Transaction.created_at >= start_date)
 
     if end_date:
-        end_date = datetime.fromisoformat(end_date)
-        query = query.filter(Event.timestamp <= end_date)
+        query = query.filter(Transaction.created_at <= end_date)
 
-    # Sorting
-    if sort_by == "timestamp":
-        if order == "asc":
-            query = query.order_by(Event.timestamp.asc())
-        else:
-            query = query.order_by(Event.timestamp.desc())
+    if order == "asc":
+        query = query.order_by(Transaction.created_at.asc())
+    else:
+        query = query.order_by(Transaction.created_at.desc())
 
     total = query.count()
 
@@ -66,7 +57,9 @@ def get_transactions(
 
 @router.get("/transactions/{txn_id}")
 def get_transaction_by_id(txn_id: str, db: Session = Depends(get_db)):
-    transaction = db.query(Transaction).filter(Transaction.transaction_id == txn_id).first()
+    transaction = db.query(Transaction).filter(
+        Transaction.transaction_id == txn_id   # adjust if needed
+    ).first()
 
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
