@@ -1,136 +1,138 @@
-# 🚀 Payment Reconciliation System
+# Payment Reconciliation Service
 
-## 🔹 Overview
+## 🚀 Live Demo
 
-This project is an event-driven payment processing and reconciliation system built using FastAPI and MySQL.
-
-It simulates how modern payment gateways process events such as payment initiation, processing, failures, and settlements, while ensuring data integrity and reconciliation.
-
----
-
-## 🔹 Key Features
-
-* Event-driven architecture
-* Idempotent event ingestion (duplicate-safe)
-* Transaction state tracking
-* Reconciliation and discrepancy detection
-* RESTful APIs with filtering support
-* Handles 10,000+ events efficiently
+**Base URL:** https://payments-service-9o9x.onrender.com
+**Swagger Docs:** https://payments-service-9o9x.onrender.com/docs
 
 ---
 
-## 🔹 Architecture
+## 📌 Overview
 
-```
-Events (JSON / API)
+This project implements an **event-driven payment reconciliation system** using FastAPI and MySQL.
+
+It ingests payment events, maintains transaction states, and provides reconciliation insights such as summaries and discrepancy detection.
+
+---
+
+## 🏗️ Architecture
+
+```text
+Client (Postman / Script)
         ↓
-FastAPI (Routes)
+FastAPI Backend (Render)
         ↓
-Service Layer (Business Logic)
+SQLAlchemy ORM
         ↓
-MySQL Database
-        ↓
-Reconciliation APIs
+MySQL Database (Railway)
 ```
 
 ---
 
-## 🔹 Database Design
+## ⚙️ Tech Stack
 
-### Tables
-
-### 1. events
-
-* Stores all incoming events (source of truth)
-* Ensures idempotency using unique `event_id`
-
-### 2. transactions
-
-* Maintains current transaction state
-* Updated based on latest event
-
-### 3. merchants
-
-* Stores merchant details
+* **Backend:** FastAPI
+* **Database:** MySQL (Railway)
+* **ORM:** SQLAlchemy
+* **Deployment:** Render
+* **Data Loader:** Python (`load_data.py`)
 
 ---
 
-## 🔹 Idempotency
+## 📡 API Endpoints
 
-Idempotency is implemented using:
+### 🔹 Events
 
-* Unique constraint on `event_id`
-* Pre-insert check to avoid duplicate processing
+* `POST /events` → Ingest event
+* `GET /events/{event_id}` → Fetch event by ID
 
-If the same event is received again:
+---
+
+### 🔹 Transactions
+
+* `GET /transactions` → Fetch transactions with:
+
+  * filtering (merchant_id, status)
+  * date range (created_at)
+  * pagination (skip, limit)
+  * sorting
+
+* `GET /transactions/{txn_id}` → Fetch transaction by ID
+
+---
+
+### 🔹 Reconciliation
+
+* `GET /reconciliation/summary` → Aggregated counts
+
+* `GET /reconciliation/discrepancies` → Detect inconsistencies
+
+  ✅ Supports optional filter:
+
+```text
+type = processed_not_settled | failed_but_settled | conflicting_transactions
+```
+
+---
+
+## 🧪 Example Request
+
+### POST /events
 
 ```json
 {
-  "status": "duplicate"
+  "event_id": "evt_12345",
+  "transaction_id": "txn_123",
+  "merchant_id": "m_001",
+  "amount": 100,
+  "currency": "INR",
+  "event_type": "payment_processed",
+  "timestamp": "2026-04-02T02:34:10.184474+00:00"
 }
 ```
 
 ---
 
-## 🔹 APIs
+## 🔁 Idempotency
 
-### 1. Ingest Event
-
-```
-POST /events
-```
-
-### 2. Get Transactions
-
-```
-GET /transactions
-```
-
-Supports filters:
-
-* merchant_id
-* status
-* pagination (skip, limit)
+* Duplicate events (same `event_id`) are ignored
+* Ensures consistent transaction state
+* Implemented via application-level checks
 
 ---
 
-### 3. Get Transaction Details
+## 📊 SQL Design
 
-```
-GET /transactions/{transaction_id}
+* Filtering, sorting, and pagination handled in SQL
+* Aggregations done using SQL (`GROUP BY`)
+
+### Indexing (considered)
+
+Indexes were considered on:
+
+```text
+event_id
+transaction_id
+merchant_id
+created_at
 ```
 
 ---
 
-### 4. Reconciliation Summary
+## 📥 Data Loading
 
-```
-GET /reconciliation/summary
+Simulate ingestion:
+
+```bash
+python load_data.py
 ```
 
-Returns count of transactions grouped by merchant and status.
+* Processes 10,000+ events
+* Demonstrates idempotency and system stability
 
 ---
 
-### 5. Reconciliation Discrepancies
-
-```
-GET /reconciliation/discrepancies
-```
-
-
-
----
-
-## 🔹 Discrepancy Cases Covered
-
-* Processed but not settled
-* Failed but settled
-* Conflicting state transitions (advanced case)
-
----
-
-## 🔹 Local Setup
+## 🛠️ Local Setup
 
 ### 1. Clone repo
 
@@ -152,10 +154,10 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Set environment variable
+### 4. Set DB URL
 
 ```bash
-export DATABASE_URL="mysql+pymysql://user:password@localhost/payments_db"
+export DATABASE_URL="your_mysql_connection_string"
 ```
 
 ### 5. Run server
@@ -164,72 +166,81 @@ export DATABASE_URL="mysql+pymysql://user:password@localhost/payments_db"
 uvicorn app.main:app --reload
 ```
 
-### 6. Open Swagger UI
+---
 
-```
-http://127.0.0.1:8000/docs
-```
+## 🧪 Testing
+
+* Swagger UI (`/docs`)
+* Postman collection included
+* Tested with large dataset (10k+ events)
 
 ---
 
-## 🔹 Load Sample Data
+## 🎥 Demo
 
-```bash
-python load_data.py
-```
+Demo covers:
 
-System successfully processed **10,000+ events with idempotent handling and zero failures**.
-
----
-
-## 🔹 Deployment
-
-* Backend hosted on Render
-* Database hosted on Railway
-
-Public URL:
-
-```
-<your-deployed-url>
-```
+* Event ingestion
+* Duplicate handling
+* Transactions API
+* Reconciliation APIs
 
 ---
 
-## 🔹 Assumptions
+## ⚖️ Assumptions
 
-* Latest event determines transaction state
-* Event ordering handled using priority logic
-* Duplicate events are ignored safely
-
----
-
-## 🔹 Tradeoffs
-
-* Some reconciliation logic implemented in Python for clarity (can be optimized using SQL)
-* No asynchronous processing (kept simple for scope)
+* Each event has a unique `event_id`
+* Transaction state derived from events
+* Data consistency prioritized over real-time streaming
 
 ---
 
-## 🔹 Future Improvements
+## 🔄 Tradeoffs
 
-* Kafka-based event streaming
-* Redis caching
-* Bulk ingestion endpoint
-* Advanced state machine validation
-
----
-
-## 🔹 AI Usage Disclosure
-
-ChatGPT was used for:
-
-* Debugging issues
-* Designing architecture
-* Improving code structure
-* Writing documentation
+* Used synchronous FastAPI for simplicity
+* No batch ingestion (kept design simple)
+* Application-level idempotency instead of DB constraints
+* Used Railway free tier for quick setup
 
 ---
 
-## 🔹 Author
+## 🚀 Future Improvements
 
-Sekhar Pidugu
+* Add DB-level unique constraints
+* Async processing / queue system
+* Batch ingestion endpoint
+* Authentication & rate limiting
+
+---
+
+## 🤖 AI Usage Disclosure
+
+AI tools were used for:
+
+* debugging deployment issues
+* improving API structure
+* refining documentation
+
+All implementation decisions were validated and executed independently.
+
+---
+
+## ✅ Summary
+
+* Processed **10,000+ events**
+* Implemented **idempotent event handling**
+* Built **scalable SQL-based APIs**
+* Deployed a **fully working public service**
+
+---
+
+## 📎 Submission Includes
+
+* GitHub Repository
+* Postman Collection
+* Demo Video
+* Live Deployment
+
+---
+
+**Author:** Sekhar
