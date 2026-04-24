@@ -187,6 +187,45 @@ Demo covers:
 
 ---
 
+## 📬 Postman Collection
+
+A Postman collection is provided to test all APIs easily.
+
+### 📦 Files Included
+
+* `postman_collection.json`
+* `postman_environment.json`
+
+### ⚙️ Setup Instructions
+
+1. Open Postman
+2. Import both files:
+
+   * Collection file
+   * Environment file
+3. Select the environment from the top-right dropdown
+4. Ensure `base_url` is set correctly:
+
+```text
+https://payments-service-9o9x.onrender.com
+```
+
+### ▶️ Usage
+
+* Use the predefined requests to test all APIs
+* Query parameters are pre-configured for filtering
+* Duplicate event request included to demonstrate idempotency
+
+### 🧪 Covered APIs
+
+* Event ingestion (`POST /events`)
+* Duplicate handling
+* Transaction queries (with filters & pagination)
+* Reconciliation summary
+* Discrepancy detection (with optional type filter)
+
+---
+
 ## ⚖️ Assumptions
 
 * Each event has a unique `event_id`
